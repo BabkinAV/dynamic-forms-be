@@ -12,7 +12,7 @@ server.use(jsonServer.bodyParser);
 server.use((req, res, next) => {
   if (req.method === 'POST') {
     // console.log(req.body);
-    const createdAt = new Date();
+    const created_at = new Date().toISOString();
 
     const newId = uuidv4().slice(0, 12);
 
@@ -21,14 +21,22 @@ server.use((req, res, next) => {
     const deferral_days = req.body.deferral_days ?? 0;
     const credit_limit = req.body.credit_limit ?? 0;
 
+    const newOrgId = uuidv4();
+    const organizationName = req.body.organization.name ?? '';
+    const inn = req.body.organization.inn ?? '';
+    const kpp = req.body.organization.kpp ?? '';
+    const ogrn = req.body.organization.ogrn ?? '';
+    const addr = req.body.organization.addr ?? '';
+		const invoice_emails = req.body.invoice_emails ?? [];
 
+    let bank_accounts = req.body.organization?.bank_accounts ?? [];
 
-		const newOrgId = uuidv4();
-		const organizationName = req.body.organization.name ?? '';
-		const inn = req.body.organization.inn ?? '';
-		const kpp = req.body.organization.kpp ?? '';
-		const ogrn = req.body.organization.ogrn ?? '';
-		const addr = req.body.organization.addr ?? '';
+    if (bank_accounts.length > 0) {
+      bank_accounts = bank_accounts.map(account => {
+        const newBankAccountId = uuidv4();
+        return { ...account, id: newBankAccountId, is_default: false, created_at, updated_at: created_at };
+      });
+    }
 
     req.body = {
       id: newId,
@@ -42,30 +50,9 @@ server.use((req, res, next) => {
         kpp,
         ogrn,
         addr,
-        bank_accounts: [
-          {
-            id: 'c0ca02e9-be90-456b-b77c-82189c7651ae',
-            name: '2',
-            bik: '123456783',
-            account_number: '12345678901234567891',
-            corr_account_number: '09876543210987654321',
-            is_default: true,
-            created_at: '2023-03-31T13:27:06Z',
-            updated_at: '2023-03-31T13:35:58Z',
-          },
-          {
-            id: '23c3a0d6-c13f-45b1-9143-ef27af1b6d44',
-            name: 'Название1',
-            bik: '123456783',
-            account_number: '12345678901234567890',
-            corr_account_number: '09876543210987654321',
-            is_default: false,
-            created_at: '2023-03-31T13:27:06Z',
-            updated_at: '2023-03-31T13:35:58Z',
-          },
-        ],
-        created_at: '2023-03-31T13:27:06Z',
-        updated_at: '2023-03-31T13:35:58Z',
+        bank_accounts,
+        created_at,
+        updated_at: created_at,
       },
       balance: {
         currency: 'RUB',
@@ -76,13 +63,12 @@ server.use((req, res, next) => {
       metadata: {
         key1: 'val1',
       },
-      created_at: createdAt.toISOString(),
-      updated_at: createdAt.toISOString(),
+      created_at,
+      updated_at: created_at,
       status: 'active',
       invoice_prefix: 'L1RFJG',
-      invoice_emails: ['123@mail.com'],
+      invoice_emails,
     };
-
   }
 
   // Continue to JSON Server router
