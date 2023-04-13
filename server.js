@@ -21,18 +21,27 @@ server.use((req, res, next) => {
     const deferral_days = req.body.deferral_days ?? 0;
     const credit_limit = req.body.credit_limit ?? 0;
 
+
+
+		const newOrgId = uuidv4();
+		const organizationName = req.body.organization.name ?? '';
+		const inn = req.body.organization.inn ?? '';
+		const kpp = req.body.organization.kpp ?? '';
+		const ogrn = req.body.organization.ogrn ?? '';
+		const addr = req.body.organization.addr ?? '';
+
     req.body = {
       id: newId,
       name,
       email,
       deferral_days,
       org: {
-        id: '131b9d78-ad58-415f-aab4-779a9e87edfd',
-        name: 'Название организации',
-        inn: '7709655212',
-        kpp: '772901001',
-        ogrn: '1026101794313',
-        addr: 'Юридический адрес',
+        id: newOrgId,
+        name: organizationName,
+        inn,
+        kpp,
+        ogrn,
+        addr,
         bank_accounts: [
           {
             id: 'c0ca02e9-be90-456b-b77c-82189c7651ae',
