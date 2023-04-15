@@ -1,8 +1,10 @@
 // server.js
 const jsonServer = require('json-server');
+const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 
 const server = jsonServer.create();
+server.use(cors());
 const router = jsonServer.router('db.json');
 const middlewares = jsonServer.defaults();
 
