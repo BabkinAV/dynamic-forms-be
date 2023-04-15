@@ -11,7 +11,6 @@ server.use(middlewares);
 server.use(jsonServer.bodyParser);
 server.use((req, res, next) => {
   if (req.method === 'POST') {
-    // console.log(req.body);
     const created_at = new Date().toISOString();
 
     const newId = uuidv4().slice(0, 12);
@@ -27,14 +26,21 @@ server.use((req, res, next) => {
     const kpp = req.body.organization.kpp ?? '';
     const ogrn = req.body.organization.ogrn ?? '';
     const addr = req.body.organization.addr ?? '';
-		const invoice_emails = req.body.invoice_emails ?? [];
+    const invoice_emails = req.body.invoice_emails ?? [];
 
     let bank_accounts = req.body.organization?.bank_accounts ?? [];
+
+    let metadata = req.body.meta ?? {};
 
     if (bank_accounts.length > 0) {
       bank_accounts = bank_accounts.map(account => {
         const newBankAccountId = uuidv4();
-        return { ...account, id: newBankAccountId, is_default: false, created_at, updated_at: created_at };
+        return {
+          ...account,
+          id: newBankAccountId,
+          created_at,
+          updated_at: created_at,
+        };
       });
     }
 
@@ -60,9 +66,7 @@ server.use((req, res, next) => {
         credit_limit,
         available_amount: 90000,
       },
-      metadata: {
-        key1: 'val1',
-      },
+      metadata,
       created_at,
       updated_at: created_at,
       status: 'active',
